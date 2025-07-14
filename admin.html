@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>SAF Admin</title>
+</head>
+<body>
+  <h2>তথ্য ইনপুট করুন</h2>
+  <input type="text" id="startYear" placeholder="বছর শুরু"><br><br>
+  <input type="text" id="endYear" placeholder="বছর শেষ"><br><br>
+  <input type="number" id="totalSavings" placeholder="মোট সঞ্চয়"><br><br>
+  <input type="number" id="totalInvestment" placeholder="মোট বিনিয়োগ"><br><br>
+  <button onclick="submitData()">সংরক্ষণ করুন</button>
+
+  <script>
+    function submitData() {
+      const startYear = document.getElementById("startYear").value;
+      const endYear = document.getElementById("endYear").value;
+      const totalSavings = document.getElementById("totalSavings").value;
+      const totalInvestment = document.getElementById("totalInvestment").value;
+      const remaining = totalSavings - totalInvestment;
+
+      fetch("https://script.google.com/macros/s/AKfycbxkjrAhfpLfrxA3pbYVUmtRI7qqRL0z2R-pco7DtvvRvYhB7DPpl9KQq4qAqtzF9tdc/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          StartYear: startYear,
+          EndYear: endYear,
+          TotalSavings: totalSavings,
+          TotalInvestment: totalInvestment,
+          Remaining: remaining
+        })
+      })
+      .then(res => res.text())
+      .then(data => alert("✅ সেভ হয়েছে!"))
+      .catch(err => alert("❌ সমস্যা: " + err));
+    }
+  </script>
+</body>
+</html>
