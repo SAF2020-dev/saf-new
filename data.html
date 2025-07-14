@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>SAF Data Viewer</title>
+</head>
+<body>
+  <h2>SAF - সঞ্চয় তালিকা</h2>
+  <table border="1" cellpadding="10">
+    <thead>
+      <tr>
+        <th>বছর শুরু</th>
+        <th>বছর শেষ</th>
+        <th>মোট সঞ্চয়</th>
+        <th>মোট বিনিয়োগ</th>
+        <th>অবশিষ্ট</th>
+      </tr>
+    </thead>
+    <tbody id="dataBody"></tbody>
+  </table>
+
+  <script>
+    fetch("https://script.google.com/macros/s/AKfycbxkjrAhfpLfrxA3pbYVUmtRI7qqRL0z2R-pco7DtvvRvYhB7DPpl9KQq4qAqtzF9tdc/exec")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("dataBody");
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.StartYear}</td>
+            <td>${row.EndYear}</td>
+            <td>${row.TotalSavings}</td>
+            <td>${row.TotalInvestment}</td>
+            <td>${row.Remaining}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => alert("ডেটা আনতে সমস্যা হয়েছে: " + err));
+  </script>
+</body>
+</html>
