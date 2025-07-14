@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>SAF.2020</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      max-width: 900;
+      margin: 20;
+      padding: 0 15px;
+      background: #f9f9f9;
+    }
+    header {
+      text-align: center;
+      padding: 20px 0;
+      
+    }
+    header h1 {
+      margin: 4px 0;
+    }
+    header p {
+      font-size: 18px;
+      color: #fffbfb;
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #066e3e;
+      margin: 0 12px;
+      font-weight: 600;
+      font-size: 22px;
+      font-family: 'Noto Sans Bengali', sans-serif;
+    }
+    nav a:hover {
+      color: #004d33;
+    }
+
+    main h1 {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #007B5E;
+      font-weight: 600;
+    }
+
+    /* টেবিল ডিজাইন */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      margin-bottom: 15px;
+    }
+    thead th {
+      background: linear-gradient(45deg, #007B5E, #004d33);
+      color: white;
+      padding: 12px 10px;
+      font-weight: 600;
+      user-select: none;
+      text-align: center;
+      font-size: 18px;
+    }
+    tbody td {
+      background: #fff;
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      font-size: 18px;
+    }
+    tbody tr:hover td {
+      background-color: #e0f2f1;
+    }
+    input[type="text"], input[type="number"] {
+      width: 90%;
+      padding: 6px 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      text-align: center;
+    }
+    button {
+      padding: 6px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      transition: background-color 0.3s;
+      font-family: 'Noto Sans Bengali', sans-serif;
+    }
+    .addBtn {
+      background-color: #007B5E;
+      color: white;
+      margin-top: 10px;
+    }
+    .addBtn:hover {
+      background-color: #004d33;
+    }
+    .deleteBtn {
+      background-color: #d9534f;
+      color: white;
+    }
+    .deleteBtn:hover {
+      background-color: #c9302c;
+    }
+    .calculateBtn {
+      background-color: #28a745;
+      color: white;
+      margin-left: 8px;
+    }
+    .calculateBtn:hover {
+      background-color: #1e7e34;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px 0;
+      color: #777;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>আমাদের ফাউন্ডেশনে স্বাগতম</h1>
+    <h1>সোতারপাড় আদর্শ ফাউন্ডেশন-২০২০</h1>
+    <p>কার্যালয়ঃ-সোঁতার পাড়,শিবচর,মাদারিপুর</p>
+    <p>একতাই উন্নতির প্রতীক</p>
+  </header>
+  
+  <nav>
+    <a href="index.html">হোম</a>
+    <a href="about.html">পরিচিতি</a>
+    <a href="members.html">সদস্য</a>
+    <a href="invest.html">বিনিয়োগ</a>
+    <a href="income and expense.html">আয় এবং ব্যয় </a>
+    <a href="notice.html">নোটিশ</a>
+    <a href="contact.html">যোগাযোগ</a>
+  </nav>
+  <main>
+    
+
+  <table>
+  <thead>
+    <tr>
+      <th>বছর শুরু</th>
+      <th>বছর শেষ</th>
+      <th>মোট সঞ্চয় (৳)</th>
+      <th>মোট বিনিয়োগ (৳)</th>
+      <th>অবশিষ্ট সঞ্চয় (৳)</th>
+      <th>অ্যাকশন</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    <!-- রো যোগ হবে এখানে -->
+  </tbody>
+</table>
+
+<button class="addBtn" onclick="addRow()">নতুন হিসাব যুক্ত করুন</button>
+<button class="calculateBtn" onclick="calculateAndSave()">হিসাব করুন ও সংরক্ষণ করুন</button>
+
+<script>
+  // যদি লগইন না করা থাকে, তাহলে login.html-এ পাঠিয়ে দাও
+  if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
+
+  // লোকাল স্টোরেজ কী
+  const STORAGE_KEY = "sanchayData";
+
+  // ইংরেজি নম্বর এ রূপান্তর
+  function convertToEnglish(numStr) {
+    const map = {'০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'};
+    return numStr.replace(/[০-৯]/g, d => map[d]);
+  }
+
+  // নতুন সারি যোগ করার ফাংশন
+  function addRow(data = {}) {
+    const tbody = document.getElementById('tableBody');
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td><input type="text" class="startYear" placeholder="২০২৪" value="${data.startYear || ''}" oninput="this.value = convertToEnglish(this.value)" /></td>
+      <td><input type="text" class="endYear" placeholder="২০২৫" value="${data.endYear || ''}" oninput="this.value = convertToEnglish(this.value)" /></td>
+      <td><input type="number" class="totalSavings" placeholder="৳" value="${data.totalSavings || ''}" min="0" /></td>
+      <td><input type="number" class="totalInvestment" placeholder="৳" value="${data.totalInvestment || ''}" min="0" /></td>
+      <td class="remainingSavings">-</td>
+      <td><button class="deleteBtn" onclick="deleteRow(this)">মুছুন</button></td>
+    `;
+
+    tbody.appendChild(tr);
+  }
+
+  // সারি ডিলিট করার ফাংশন
+  function deleteRow(btn) {
+    const tr = btn.closest('tr');
+    tr.remove();
+    calculateAndSave(); // ডিলিট করার পরও সেভ হোক
+  }
+
+  // হিসাব করা ও লোকাল স্টোরেজে সেভ করার ফাংশন
+  function calculateAndSave() {
+    const rows = document.querySelectorAll('#tableBody tr');
+    const data = [];
+
+    rows.forEach(row => {
+      const startYear = row.querySelector('.startYear').value.trim();
+      const endYear = row.querySelector('.endYear').value.trim();
+      const totalSavings = parseFloat(row.querySelector('.totalSavings').value) || 0;
+      const totalInvestment = parseFloat(row.querySelector('.totalInvestment').value) || 0;
+      const remaining = totalSavings - totalInvestment;
+
+      row.querySelector('.remainingSavings').textContent = remaining.toFixed(2) + ' ৳';
+
+      data.push({ startYear, endYear, totalSavings, totalInvestment, remaining });
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  // লোড করার সময় লোকালস্টোরেজ থেকে ডাটা নিয়ে আসা
+  function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      data.forEach(item => addRow(item));
+      calculateAndSave();
+    } else {
+      addRow(); // যদি ডাটা না থাকে তাহলে একটুও তৈরি কর
+    }
+  }
+  
+  window.onload = loadData;
+</script>
+<footer>
+    <p>© ২০২৫ আমাদের ফাউন্ডেশন </p>
+  </footer>
+</body>
+</html>

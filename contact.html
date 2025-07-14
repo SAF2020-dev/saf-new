@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>পরিচিতি</title>
+   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet" />
+  <style>
+    /* বেসিক স্টাইল */
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #007B5E;
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      letter-spacing: 1.2px;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    main h2 {
+      margin-top: 0;
+      color: #007B5E;
+      font-size: 1.8rem;
+      border-bottom: 2px solid #007B5E;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    main p {
+      font-size: 1.1rem;
+      margin: 12px 0;
+      padding-left: 15px;
+      position: relative;
+    }
+
+    main p::before {
+      content: "📞 ";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      color: #007B5E;
+    }
+
+    /* ঠিকানার জন্য আলাদা আইকন */
+    main p:last-child::before {
+      content: "📍 ";
+    }
+
+    footer {
+      background-color: #f1f1f1;
+      color: #555;
+      text-align: center;
+      padding: 15px 10px;
+      font-size: 0.9rem;
+      border-top: 1px solid #ddd;
+      margin-top: 40px;
+      letter-spacing: 0.4px;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      main {
+        margin: 20px 15px;
+        padding: 20px;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+      main h2 {
+        font-size: 1.4rem;
+      }
+      main p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="page-title">যোগাযোগ</h1>
+  </header> 
+<nav> <a href="index.html">হোম</a> <nav>
+  <main>
+    <h2>যোগাযোগ</h2>
+    <p>চেয়ারম্যান - মোবাইল: ০১৭৯৩৪০২৭১৯</p>
+    <p>সাধারণ সম্পাদক - মোবাইল: ০১৩২২৪২৬৩৯</p>
+    <p>ঠিকানা: গ্রাম - সোতারপাড়, উপজেলা - শিবচর, জেলা - মাদারীপুর</p>
+  </main>
+
+  <footer>
+    <p>© ২০২৫ আমাদের ফাউন্ডেশন</p>
+  </footer>
+</body>
+</html>

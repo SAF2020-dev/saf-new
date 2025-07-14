@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>আয় এবং ব্যয় হিসাব</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
+    }
+
+    header {
+      background-color: #007B5E;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1.page-title {
+      font-size: 32px;
+      color: #FFD700;
+    }
+
+    main {
+      padding: 25px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #007B5E;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    thead th {
+      background: linear-gradient(45deg, #007B5E, #004d33);
+      color: white;
+      padding: 12px 10px;
+    }
+
+    tbody td {
+      background: #fff;
+      padding: 12px 10px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr:hover td {
+      background-color: #e0f2f1;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 90%;
+      padding: 6px 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 6px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      margin-top: 10px;
+      margin-right: 6px;
+    }
+
+    .addBtn {
+      background-color: #007B5E;
+      color: white;
+    }
+
+    .addBtn:hover {
+      background-color: #004d33;
+    }
+
+    .deleteBtn {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .deleteBtn:hover {
+      background-color: #c9302c;
+    }
+
+    .calculateBtn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .calculateBtn:hover {
+      background-color: #1e7e34;
+    }
+
+   footer {
+  background-color: #ffffff; /* সাদা ব্যাকগ্রাউন্ড */
+  color: #444444;            /* গা dark ধূসর লেখা */
+  text-align: center;
+  padding: 15px;
+  margin-top: 40px;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1 class="page-title">বাৎসরিক আয় এবং ব্যয় হিসাব</h1>
+  </header>
+  <nav> <a href="index.html">হোম</a> <nav>
+  <main>
+
+    <!-- আয় ব্যয় হিসাব -->
+    <h2>বাৎসরিক আয় এবং ব্যয় হিসাব</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>বছর</th>
+          <th>মোট আয় (৳)</th>
+          <th>মোট ব্যয় (৳)</th>
+          <th>অবশিষ্ট অর্থ (৳)</th>
+          <th>অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <button class="addBtn" onclick="addRow()">নতুন হিসাব যুক্ত করুন</button>
+    <button class="calculateBtn" onclick="calculateAndSave()">হিসাব করুন এবং সংরক্ষণ করুন</button>
+
+    <!-- সার্ভিস চার্জ হিসাব -->
+    <h2>সার্ভিস চার্জ হিসাব</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>বছর</th>
+          <th>মোট সার্ভিস চার্জ (৳)</th>
+          <th>মোট ব্যয় (৳)</th>
+          <th>অবশিষ্ট অর্থ (৳)</th>
+          <th>অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody id="chargeTableBody"></tbody>
+    </table>
+    <button class="addBtn" onclick="addChargeRow()">নতুন সার্ভিস চার্জ যুক্ত করুন</button>
+    <button class="calculateBtn" onclick="saveCharge()">হিসাব করুন এবং সংরক্ষণ করুন</button>
+
+  </main>
+
+  <!-- Script -->
+  <script>
+    const STORAGE_KEY = 'incomeExpenseData';
+    const CHARGE_KEY = 'serviceChargeData';
+
+    function convertToEnglish(str) {
+      const map = {'০': '0','১': '1','২': '2','৩': '3','৪': '4','৫': '5','৬': '6','৭': '7','৮': '8','৯': '9'};
+      return str.replace(/[০-৯]/g, m => map[m]);
+    }
+
+    function addRow(data = {}) {
+      const tbody = document.getElementById('tableBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="year" value="${data.year || ''}" oninput="this.value = convertToEnglish(this.value)" /></td>
+        <td><input type="number" class="income" value="${data.income || ''}" /></td>
+        <td><input type="number" class="expense" value="${data.expense || ''}" /></td>
+        <td class="remaining">${data.remaining !== undefined ? data.remaining.toFixed(2) + ' ৳' : '-'}</td>
+        <td><button class="deleteBtn" onclick="deleteRow(this, 'income')">মুছুন</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function calculateAndSave() {
+      const rows = document.querySelectorAll('#tableBody tr');
+      const data = [];
+
+      rows.forEach(row => {
+        const year = row.querySelector('.year').value.trim();
+        const income = parseFloat(row.querySelector('.income').value) || 0;
+        const expense = parseFloat(row.querySelector('.expense').value) || 0;
+        const remaining = income - expense;
+
+        row.querySelector('.remaining').textContent = remaining.toFixed(2) + ' ৳';
+        data.push({ year, income, expense, remaining });
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function addChargeRow(data = {}) {
+      const tbody = document.getElementById('chargeTableBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="chargeYear" value="${data.year || ''}" oninput="this.value = convertToEnglish(this.value)" /></td>
+        <td><input type="number" class="charge" value="${data.charge || ''}" /></td>
+        <td><input type="number" class="chargeExpense" value="${data.expense || ''}" /></td>
+        <td class="chargeRemaining">${data.remaining !== undefined ? data.remaining.toFixed(2) + ' ৳' : '-'}</td>
+        <td><button class="deleteBtn" onclick="deleteRow(this, 'charge')">মুছুন</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function saveCharge() {
+      const rows = document.querySelectorAll('#chargeTableBody tr');
+      const data = [];
+
+      rows.forEach(row => {
+        const year = row.querySelector('.chargeYear').value.trim();
+        const charge = parseFloat(row.querySelector('.charge').value) || 0;
+        const expense = parseFloat(row.querySelector('.chargeExpense').value) || 0;
+        const remaining = charge - expense;
+
+        row.querySelector('.chargeRemaining').textContent = remaining.toFixed(2) + ' ৳';
+        data.push({ year, charge, expense, remaining });
+      });
+
+      localStorage.setItem(CHARGE_KEY, JSON.stringify(data));
+    }
+
+    function deleteRow(btn, type) {
+      const row = btn.closest('tr');
+      row.remove();
+      if (type === 'income') calculateAndSave();
+      if (type === 'charge') saveCharge();
+    }
+
+    function loadData() {
+      const incomeData = localStorage.getItem(STORAGE_KEY);
+      if (incomeData) {
+        JSON.parse(incomeData).forEach(data => addRow(data));
+      } else {
+        addRow();
+      }
+
+      const chargeData = localStorage.getItem(CHARGE_KEY);
+      if (chargeData) {
+        JSON.parse(chargeData).forEach(data => addChargeRow(data));
+      } else {
+        addChargeRow();
+      }
+    }
+
+    window.onload = loadData;
+  </script>
+
+  <!-- Footer -->
+  <footer>
+    <p>© ২০২৫ আমাদের ফাউন্ডেশন</p>
+  </footer>
+
+</body>
+</html>

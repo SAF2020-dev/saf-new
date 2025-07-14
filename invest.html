@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>বিনিয়োগ তথ্য</title>
+   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #007B5E;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    .input-form {
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 30px;
+    }
+    .input-group {
+      margin-bottom: 10px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 16px;
+      background-color: #007B5E;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005F48;
+    }
+    .member-group {
+      margin-bottom: 40px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: #eef6f3;
+      padding: 15px;
+    }
+    .summary-box {
+      margin-bottom: 10px;
+    }
+    .summary-box p {
+      margin: 5px 0;
+      line-height: 1.6;
+      font-size: 1.1em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #007B5E;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    .delete-btn {
+      background-color: #dc3545;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background-color: #b02a37;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>বিনিয়োগ তথ্য</h1>
+  </header>
+<nav> <a href="index.html">হোম</a> <nav>
+  <main>
+    <form class="input-form" onsubmit="handleForm(event)">
+      <div class="input-group">
+        <label>সদস্য নাম:</label>
+        <input type="text" id="memberName" required />
+      </div>
+      <div class="input-group">
+        <label>ঠিকানা:</label>
+        <input type="text" id="memberAddress" />
+      </div>
+      <div class="input-group">
+        <label>মোবাইল নম্বর:</label>
+        <input type="text" id="memberPhone" />
+      </div>
+      <div class="input-group">
+        <label>বিনিয়োগ শুরুর তারিখ:</label>
+        <input type="date" id="startDate" />
+      </div>
+      <div class="input-group">
+        <label>বিনিয়োগ শেষ তারিখ:</label>
+        <input type="date" id="endDate" />
+      </div>
+      <hr />
+      <div class="input-group">
+        <label>বিনিয়োগের পরিমাণ (৳):</label>
+        <input type="number" id="amount" required min="0" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label>লভ্যাংশ %:</label>
+        <input type="number" id="percent" required min="0" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label>সময়কাল:</label>
+        <input type="text" id="duration" required />
+      </div>
+      <button type="submit">যোগ করুন</button>
+    </form>
+
+    <div id="allInvestmentsContainer"></div>
+  </main>
+
+  
+
+  <script>
+    let investments = JSON.parse(localStorage.getItem('investments')) || [];
+
+    function groupByMember(data) {
+      const grouped = {};
+      data.forEach(item => {
+        const key = item.name + '|' + item.phone + '|' + item.address + '|' + item.startDate + '|' + item.endDate;
+        if (!grouped[key]) {
+          grouped[key] = {
+            memberInfo: {
+              name: item.name,
+              address: item.address,
+              phone: item.phone,
+              startDate: item.startDate,
+              endDate: item.endDate
+            },
+            investments: []
+          };
+        }
+        grouped[key].investments.push(item);
+      });
+      return grouped;
+    }
+
+    function render() {
+      const container = document.getElementById('allInvestmentsContainer');
+      container.innerHTML = '';
+
+      const groupedData = groupByMember(investments);
+
+      let memberSerial = 1;
+
+      for (const key in groupedData) {
+        const memberGroup = groupedData[key];
+        const memberInfo = memberGroup.memberInfo;
+        const invList = memberGroup.investments;
+
+        const memberDiv = document.createElement('div');
+        memberDiv.className = 'member-group';
+
+        const summaryBox = document.createElement('div');
+        summaryBox.className = 'summary-box';
+        summaryBox.innerHTML = `
+          <p><strong>${memberSerial++}. বিনিয়োগ-</strong></p>
+          <p><strong>নাম:</strong> ${memberInfo.name}</p>
+          <p><strong>ঠিকানা:</strong> ${memberInfo.address}</p>
+          <p><strong>মোবাইল:</strong> ${memberInfo.phone}</p>
+          <p><strong>বিনিয়োগ শুরুর তারিখ:</strong> ${memberInfo.startDate}</p>
+          <p><strong>বিনিয়োগ শেষ তারিখ:</strong> ${memberInfo.endDate}</p>
+        `;
+        memberDiv.appendChild(summaryBox);
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>বিনিয়োগ (৳)</th>
+              <th>লভ্যাংশ %</th>
+              <th>লভ্যাংশ (৳)</th>
+              <th>সময়কাল</th>
+              <th>মোট ফেরত (৳)</th>
+              <th>ডিলিট</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector('tbody');
+
+        invList.forEach((inv, index) => {
+          const profit = ((inv.amount * inv.percent) / 100).toFixed(2);
+          const total = (inv.amount + parseFloat(profit)).toFixed(2);
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${inv.amount}</td>
+            <td>${inv.percent}%</td>
+            <td>${profit}</td>
+            <td>${inv.duration}</td>
+            <td>${total}</td>
+            <td><button class="delete-btn" onclick="deleteInvestment('${key}', ${index})">✖</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        memberDiv.appendChild(table);
+        container.appendChild(memberDiv);
+      }
+    }
+
+    function handleForm(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("memberName").value.trim();
+      const address = document.getElementById("memberAddress").value.trim();
+      const phone = document.getElementById("memberPhone").value.trim();
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+
+      const amount = parseFloat(document.getElementById("amount").value);
+      const percent = parseFloat(document.getElementById("percent").value);
+      const duration = document.getElementById("duration").value.trim();
+
+      if (!name || !amount || !percent || !duration) {
+        alert("অনুগ্রহ করে সব তথ্য দিন।");
+        return;
+      }
+
+      const investment = {
+        name, address, phone, startDate, endDate,
+        amount, percent, duration
+      };
+
+      investments.push(investment);
+      localStorage.setItem("investments", JSON.stringify(investments));
+      render();
+      e.target.reset();
+    }
+
+    function deleteInvestment(memberKey, invIndex) {
+      const groupedData = groupByMember(investments);
+
+      if (!groupedData[memberKey]) return;
+
+      const memberInvestments = groupedData[memberKey].investments;
+
+      if (invIndex >= memberInvestments.length) return;
+
+      const invToDelete = memberInvestments[invIndex];
+
+      const invIndexInMain = investments.findIndex(inv =>
+        inv.name === invToDelete.name &&
+        inv.phone === invToDelete.phone &&
+        inv.address === invToDelete.address &&
+        inv.startDate === invToDelete.startDate &&
+        inv.endDate === invToDelete.endDate &&
+        inv.amount === invToDelete.amount &&
+        inv.percent === invToDelete.percent &&
+        inv.duration === invToDelete.duration
+      );
+
+      if (invIndexInMain !== -1) {
+        investments.splice(invIndexInMain, 1);
+        localStorage.setItem("investments", JSON.stringify(investments));
+        render();
+      }
+    }
+
+    window.onload = render;
+  </script>
+   <footer>
+    <p>© ২০২৫ আমাদের ফাউন্ডেশন </p>
+  </footer>
+</body>
+</html>

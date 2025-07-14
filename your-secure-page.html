@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>SAF.2020</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 15px;
+      background: #f9f9f9;
+    }
+    header {
+      text-align: center;
+      padding: 20px 0;
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #066e3e;
+      margin: 0 12px;
+      font-weight: 600;
+      font-size: 22px;
+    }
+    nav a:hover {
+      color: #004d33;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      background-color: #c9302c;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    thead th {
+      background: linear-gradient(45deg, #007B5E, #004d33);
+      color: white;
+      padding: 12px;
+      font-size: 18px;
+    }
+    tbody td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    input[type="text"], input[type="number"] {
+      width: 90%;
+      padding: 6px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+    }
+    button {
+      padding: 6px 12px;
+      margin: 8px 4px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .addBtn {
+      background-color: #007B5E;
+      color: white;
+    }
+    .calculateBtn {
+      background-color: #28a745;
+      color: white;
+    }
+    .deleteBtn {
+      background-color: #d9534f;
+      color: white;
+    }
+    footer {
+      text-align: center;
+      padding: 15px 0;
+      color: #777;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔐 লগইন চেক -->
+  <script>
+    if (localStorage.getItem("loggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <!-- 🔓 Logout Button -->
+  <button class="logout-btn" onclick="logout()">লগ আউট</button>
+
+  <header>
+    <h1>সোতারপাড় আদর্শ ফাউন্ডেশন-২০২০</h1>
+    <p>একতাই উন্নতির প্রতীক</p>
+  </header>
+
+  <nav>
+    <a href="index.html">হোম</a>
+    <a href="members.html">সদস্য</a>
+    <a href="invest.html">বিনিয়োগ</a>
+    <a href="income.html">আয়-ব্যয়</a>
+  </nav>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>বছর শুরু</th>
+          <th>বছর শেষ</th>
+          <th>মোট সঞ্চয় (৳)</th>
+          <th>মোট বিনিয়োগ (৳)</th>
+          <th>অবশিষ্ট (৳)</th>
+          <th>মুছুন</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- সারি আসবে -->
+      </tbody>
+    </table>
+    <button class="addBtn" onclick="addRow()">নতুন হিসাব</button>
+    <button class="calculateBtn" onclick="calculateAndSave()">হিসাব ও সংরক্ষণ</button>
+  </main>
+
+  <footer>
+    <p>© ২০২৫ আমাদের ফাউন্ডেশন</p>
+  </footer>
+
+  <script>
+    // 🔓 Logout ফাংশন
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    const STORAGE_KEY = "sanchayData";
+
+    function convertToEnglish(numStr) {
+      const map = {'০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'};
+      return numStr.replace(/[০-৯]/g, d => map[d]);
+    }
+
+    function addRow(data = {}) {
+      const tbody = document.getElementById('tableBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="startYear" value="${data.startYear || ''}" oninput="this.value = convertToEnglish(this.value)" /></td>
+        <td><input type="text" class="endYear" value="${data.endYear || ''}" oninput="this.value = convertToEnglish(this.value)" /></td>
+        <td><input type="number" class="totalSavings" value="${data.totalSavings || ''}" /></td>
+        <td><input type="number" class="totalInvestment" value="${data.totalInvestment || ''}" /></td>
+        <td class="remainingSavings">-</td>
+        <td><button class="deleteBtn" onclick="deleteRow(this)">মুছুন</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function deleteRow(btn) {
+      btn.closest('tr').remove();
+      calculateAndSave();
+    }
+
+    function calculateAndSave() {
+      const rows = document.querySelectorAll('#tableBody tr');
+      const data = [];
+
+      rows.forEach(row => {
+        const startYear = row.querySelector('.startYear').value.trim();
+        const endYear = row.querySelector('.endYear').value.trim();
+        const totalSavings = parseFloat(row.querySelector('.totalSavings').value) || 0;
+        const totalInvestment = parseFloat(row.querySelector('.totalInvestment').value) || 0;
+        const remaining = totalSavings - totalInvestment;
+        row.querySelector('.remainingSavings').textContent = remaining.toFixed(2) + ' ৳';
+
+        data.push({ startYear, endYear, totalSavings, totalInvestment, remaining });
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        data.forEach(item => addRow(item));
+        calculateAndSave();
+      } else {
+        addRow();
+      }
+    }
+
+    window.onload = loadData;
+  </script>
+</body>
+</html>

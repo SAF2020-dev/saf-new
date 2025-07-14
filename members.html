@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <title>সদস্য তালিকা ও হিসাব</title>
+   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      background-color: #fdfdfd;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
+    }
+
+    header {
+      background-color: #007B5E;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1.page-title {
+      font-size: 32px;
+      color: #FFD700;
+    }
+
+    main {
+      padding: 25px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      color: #0066cc;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+
+    .collapsible {
+      background-color: #007B5E;
+      color: white;
+      cursor: pointer;
+      padding: 12px 16px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      font-size: 18px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .collapsible:hover {
+      background-color: #56b19a;
+    }
+
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #ece6e6;
+      margin-bottom: 10px;
+      border-radius: 0 0 5px 5px;
+    }
+
+    ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin: 5px 0;
+      position: relative;
+      padding-right: 70px;
+    }
+
+    .delete-btn {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #b02a37;
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .add-member-form input {
+      padding: 8px;
+      margin: 8px 4px;
+      width: 48%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .add-member-form button {
+      padding: 10px 20px;
+      background-color: #75cf8a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .add-member-form button:hover {
+      background-color: #1ed145;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #b4aeae;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #d48031;
+      color: rgb(255, 255, 255);
+    }
+
+    footer {
+      text-align: center;
+      background-color: white;
+      padding: 10px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="page-title">সদস্য তালিকা</h1>
+  </header>
+  <nav><a href="index.html">হোম</a><nav>
+
+  <main>
+    <h2>সদস্য তথ্য</h2>
+    <button class="collapsible">➤ সাধারণ সদস্য তালিকা</button>
+    <div class="content">
+      <ul id="general-members-list"></ul>
+    </div>
+
+    <button class="collapsible">➤ নতুন সাধারণ সদস্য যুক্ত করুন</button>
+    <div class="content">
+      <form class="add-member-form" id="add-member-form">
+        <input type="text" id="memberNumber" placeholder="সদস্য নং" required>
+        <input type="text" id="memberName" placeholder="সদস্য নাম" required>
+        <input type="text" id="memberPhone" placeholder="ফোন নম্বর">
+        <input type="email" id="memberEmail" placeholder="ইমেইল (ঐচ্ছিক)">
+        <button type="submit">যুক্ত করুন</button>
+      </form>
+    </div>
+
+    <h2>সদস্য হিসাব</h2>
+    <label for="yearSelect">বছর নির্বাচন করুন:</label>
+    <select id="yearSelect" onchange="loadAllMemberAccounts()">
+      <!-- বছরগুলি JavaScript দিয়ে জেনারেট করবো -->
+    </select>
+
+    <div id="accountsContainer"></div>
+  </main>
+
+  <footer>
+    <p>© ২০২৫ আমাদের ফাউন্ডেশন</p>
+  </footer>
+
+  <script>
+    const months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+    const accountStorageKey = "memberAccounts";
+
+    // collapsible
+    document.querySelectorAll(".collapsible").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+    });
+
+    function populateYearDropdown() {
+      const yearSelect = document.getElementById("yearSelect");
+      for (let y = 2020; y <= 2080; y++) {
+        const option = document.createElement("option");
+        option.value = y;
+        option.text = y.toString();
+        if (y === new Date().getFullYear()) option.selected = true;
+        yearSelect.appendChild(option);
+      }
+    }
+
+    function loadMembers() {
+      const members = JSON.parse(localStorage.getItem('members')) || [];
+      const memberList = document.getElementById('general-members-list');
+      memberList.innerHTML = '';
+      members.forEach((member, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>সদস্য নং:</strong> ${member.number} <br>
+                        <strong>নাম:</strong> ${member.name}<br>
+                        <strong>ফোন:</strong> ${member.phone || '-'} <br>
+                        <strong>ইমেইল:</strong> ${member.email || '-'}
+                        <button class="delete-btn" onclick="deleteMember(${index})">✖</button>`;
+        memberList.appendChild(li);
+      });
+    }
+
+    document.getElementById('add-member-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const number = document.getElementById('memberNumber').value.trim();
+      const name = document.getElementById('memberName').value.trim();
+      const phone = document.getElementById('memberPhone').value.trim();
+      const email = document.getElementById('memberEmail').value.trim();
+
+      if (!number || !name) return alert('সদস্য নং এবং নাম দিতে হবে');
+
+      let members = JSON.parse(localStorage.getItem('members')) || [];
+      if (members.some(m => m.number === number)) return alert('এই সদস্য নং আগেই যুক্ত আছে');
+
+      members.push({ number, name, phone, email });
+      localStorage.setItem('members', JSON.stringify(members));
+      this.reset();
+      loadMembers();
+      loadAllMemberAccounts();
+    });
+
+    function deleteMember(index) {
+      if (confirm('সদস্যটি মুছতে চান?')) {
+        let members = JSON.parse(localStorage.getItem('members')) || [];
+        members.splice(index, 1);
+        localStorage.setItem('members', JSON.stringify(members));
+        loadMembers();
+        loadAllMemberAccounts();
+      }
+    }
+
+    function loadAllMemberAccounts() {
+      const selectedYear = document.getElementById("yearSelect").value;
+      const members = JSON.parse(localStorage.getItem('members')) || [];
+      const allAccounts = JSON.parse(localStorage.getItem(accountStorageKey)) || {};
+      const container = document.getElementById("accountsContainer");
+      container.innerHTML = '';
+
+      members.forEach(member => {
+        const id = member.number;
+        if (!allAccounts[id]) allAccounts[id] = {};
+        if (!allAccounts[id][selectedYear]) {
+          allAccounts[id][selectedYear] = {};
+          months.forEach(month => {
+            allAccounts[id][selectedYear][month] = 0;
+          });
+        }
+        const data = allAccounts[id][selectedYear];
+        const total = Object.values(data).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr><th colspan="14">${member.name} (সদস্য নং: ${id})</th></tr>
+            <tr>${months.map(m => `<th>${m}</th>`).join('')}<th>মোট</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              ${months.map(month => `<td><input type="number" value="${data[month]}" onchange="updateMonthAmount('${id}', '${selectedYear}', '${month}', this.value)" style="width:60px"></td>`).join('')}
+              <td><strong>${total.toFixed(2)}</strong></td>
+            </tr>
+          </tbody>
+        `;
+        container.appendChild(table);
+      });
+
+      localStorage.setItem(accountStorageKey, JSON.stringify(allAccounts));
+    }
+
+    function updateMonthAmount(memberId, year, month, value) {
+      const allAccounts = JSON.parse(localStorage.getItem(accountStorageKey)) || {};
+      if (!allAccounts[memberId]) allAccounts[memberId] = {};
+      if (!allAccounts[memberId][year]) allAccounts[memberId][year] = {};
+      allAccounts[memberId][year][month] = parseFloat(value) || 0;
+      localStorage.setItem(accountStorageKey, JSON.stringify(allAccounts));
+      loadAllMemberAccounts();
+    }
+
+    window.onload = () => {
+      populateYearDropdown();
+      loadMembers();
+      loadAllMemberAccounts();
+    };
+  </script>
+</body>
+</html>
